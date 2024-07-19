@@ -57,10 +57,16 @@ services:
     container_name: WAPDI-react
     env_file:
         - ../react/.env
-    working_dir: /app/react
-    command:
-        - sh -c 'npx create-react-app react-app --template typescript'
-        - sh -c "cd /app/react && yarn start"
+    volumes:
+      - type: bind
+        source: ../react/react-app
+        target: /app/react/react-app
+    command: sh -c "
+      if [ ! -d react-app ]; then
+      npx create-react-app react-app --template typescript;
+      fi;
+      cd react-app && yarn start
+      "
     ports:
         - 3000:3000
     networks:
