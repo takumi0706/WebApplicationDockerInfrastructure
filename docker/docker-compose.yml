@@ -2,21 +2,20 @@ version: "3"
 services:
   mysql:
     build: ../mysql
-    container_name: WAPDI-mysql
+    container_name: WADI-mysql
     env_file:
       - ../mysql/db.env
-#      TODO: mysqlディレクトリに.envファイルを作成する
     volumes:
         - ../mysql/data:/var/lib/mysql #実データの永続化
         - ../mysql/log:/var/log/mysql #ログの永続化
     ports:
         - "13306:3306"
     networks:
-        - WAPDI-net
+        - WADI-net
 
   dbclient:
-    image: phpyadmin/phpyadmin
-    container_name: WAPDI-dbclient
+    image: phpmyadmin/phpmyadmin
+    container_name: WADI-dbclient
     env_file:
         - ../dbclient/dbconfig.env
     links:
@@ -29,13 +28,13 @@ services:
         mysql:
             condition: service_started
     networks:
-        - WAPDI-net
+        - WADI-net
 
   springboot:
     build:
         context: ../springboot
         dockerfile: Dockerfile
-    container_name: WAPDI-springboot
+    container_name: WADI-springboot
     env_file:
         - ../mysql/db.env
     tty: true
@@ -48,13 +47,13 @@ services:
             condition: service_started
     entrypoint: "java -jar /app/app.jar"
     networks:
-        - WAPDI-net
+        - WADI-net
 
   react:
     build:
         context: ../react
         dockerfile: Dockerfile
-    container_name: WAPDI-react
+    container_name: WADI-react
     env_file:
         - ../react/.env
     volumes:
@@ -68,9 +67,8 @@ services:
     ports:
         - 3000:3000
     networks:
-        - WAPDI-net
-    stdin_open: true #標準入力をコンテナと紐づける
+        - WADI-net
 
 networks:
-    WAPDI-net:
+    WADI-net:
       driver: bridge
