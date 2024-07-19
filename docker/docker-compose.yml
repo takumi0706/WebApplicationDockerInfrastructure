@@ -1,0 +1,74 @@
+version: "3"
+services:
+#  mysql:
+#    build: ../mysql
+#    container_name: WAPDI-mysql
+#    env_file:
+#      - ../mysql/db.env
+##      TODO: mysqlディレクトリに.envファイルを作成する
+#    volumes:
+#        - ../mysql/data:/var/lib/mysql #実データの永続化
+#        - ../mysql/log:/var/log/mysql #ログの永続化
+#    ports:
+#        - "13306:3306"
+#    networks:
+#        - WAPDI-net
+#
+#  dbclient:
+#    image: phpyadmin/phpyadmin
+#    container_name: WAPDI-dbclient
+#    env_file:
+#        - ../dbclient/dbconfig.env
+#    links:
+#      - mysql
+#    ports:
+#        - "14200:80"
+#    volumes:
+#        - ../dbclient/sessions:/sessions
+#    depends_on:
+#        mysql:
+#            condition: service_started
+#    networks:
+#        - WAPDI-net
+#
+#  springboot:
+#    build:
+#        context: ../springboot
+#        dockerfile: Dockerfile
+#    container_name: WAPDI-springboot
+#    env_file:
+#        - ../mysql/db.env
+#    tty: true
+#    working_dir: /app/springboot
+#    ports:
+#        - 8080:8080 #アプリケーション用
+#        - 5050:5050 #デバッグ用
+#    depends_on:
+#        mysql:
+#            condition: service_started
+#    entrypoint: "java -jar /app/app.jar"
+#    networks:
+#        - WAPDI-net
+
+  react:
+    build:
+        context: ../react
+        dockerfile: Dockerfile
+    container_name: WAPDI-react
+    env_file:
+        - ../react/.env
+    working_dir: /app/react
+    command:
+        - sh -c 'npx create-react-app react-app --template typescript'
+        - sh -c "cd /app/react && yarn start"
+    ports:
+        - 3000:3000
+    networks:
+        - WAPDI-net
+    stdin_open: true #標準入力をコンテナと紐づける
+
+networks:
+    WAPDI-net:
+      driver: bridge
+
+
