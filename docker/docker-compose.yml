@@ -1,0 +1,74 @@
+version: "3"
+services:
+  mysql:
+    build: ../mysql
+    container_name: WADI-mysql
+    env_file:
+      - ../mysql/db.env
+    volumes:
+        - ../mysql/data:/var/lib/mysql #実データの永続化
+        - ../mysql/log:/var/log/mysql #ログの永続化
+    ports:
+        - "13306:3306"
+    networks:
+        - WADI-net
+
+  dbclient:
+    image: phpmyadmin/phpmyadmin
+    container_name: WADI-dbclient
+    env_file:
+        - ../dbclient/dbconfig.env
+    links:
+      - mysql
+    ports:
+        - "14200:80"
+    volumes:
+        - ../dbclient/sessions:/sessions
+    depends_on:
+        mysql:
+            condition: service_started
+    networks:
+        - WADI-net
+
+  springboot:
+    build:
+        context: ../springboot
+        dockerfile: Dockerfile
+    container_name: WADI-springboot
+    env_file:
+        - ../mysql/db.env
+    tty: true
+    working_dir: /app/springboot
+    ports:
+        - 8080:8080 #アプリケーション用
+        - 5050:5050 #デバッグ用
+    depends_on:
+        mysql:
+            condition: service_started
+    entrypoint: "java -jar /app/app.jar"
+    networks:
+        - WADI-net
+
+  react:
+    build:
+        context: ../react
+        dockerfile: Dockerfile
+    container_name: WADI-react
+    env_file:
+        - ../react/.env
+    volumes:
+      - ../react/app:/usr/src/app
+    command: sh -c "
+      if [ ! -d react-app ]; then
+      npx create-react-app react-app --template typescript;
+      fi;
+      cd react-app && yarn start
+      "
+    ports:
+        - 3000:3000
+    networks:
+        - WADI-net
+
+networks:
+    WADI-net:
+      driver: bridge
