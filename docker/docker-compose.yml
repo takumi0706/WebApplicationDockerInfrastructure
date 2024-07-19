@@ -1,54 +1,54 @@
 version: "3"
 services:
-#  mysql:
-#    build: ../mysql
-#    container_name: WAPDI-mysql
-#    env_file:
-#      - ../mysql/db.env
-##      TODO: mysqlディレクトリに.envファイルを作成する
-#    volumes:
-#        - ../mysql/data:/var/lib/mysql #実データの永続化
-#        - ../mysql/log:/var/log/mysql #ログの永続化
-#    ports:
-#        - "13306:3306"
-#    networks:
-#        - WAPDI-net
-#
-#  dbclient:
-#    image: phpyadmin/phpyadmin
-#    container_name: WAPDI-dbclient
-#    env_file:
-#        - ../dbclient/dbconfig.env
-#    links:
-#      - mysql
-#    ports:
-#        - "14200:80"
-#    volumes:
-#        - ../dbclient/sessions:/sessions
-#    depends_on:
-#        mysql:
-#            condition: service_started
-#    networks:
-#        - WAPDI-net
-#
-#  springboot:
-#    build:
-#        context: ../springboot
-#        dockerfile: Dockerfile
-#    container_name: WAPDI-springboot
-#    env_file:
-#        - ../mysql/db.env
-#    tty: true
-#    working_dir: /app/springboot
-#    ports:
-#        - 8080:8080 #アプリケーション用
-#        - 5050:5050 #デバッグ用
-#    depends_on:
-#        mysql:
-#            condition: service_started
-#    entrypoint: "java -jar /app/app.jar"
-#    networks:
-#        - WAPDI-net
+  mysql:
+    build: ../mysql
+    container_name: WAPDI-mysql
+    env_file:
+      - ../mysql/db.env
+#      TODO: mysqlディレクトリに.envファイルを作成する
+    volumes:
+        - ../mysql/data:/var/lib/mysql #実データの永続化
+        - ../mysql/log:/var/log/mysql #ログの永続化
+    ports:
+        - "13306:3306"
+    networks:
+        - WAPDI-net
+
+  dbclient:
+    image: phpyadmin/phpyadmin
+    container_name: WAPDI-dbclient
+    env_file:
+        - ../dbclient/dbconfig.env
+    links:
+      - mysql
+    ports:
+        - "14200:80"
+    volumes:
+        - ../dbclient/sessions:/sessions
+    depends_on:
+        mysql:
+            condition: service_started
+    networks:
+        - WAPDI-net
+
+  springboot:
+    build:
+        context: ../springboot
+        dockerfile: Dockerfile
+    container_name: WAPDI-springboot
+    env_file:
+        - ../mysql/db.env
+    tty: true
+    working_dir: /app/springboot
+    ports:
+        - 8080:8080 #アプリケーション用
+        - 5050:5050 #デバッグ用
+    depends_on:
+        mysql:
+            condition: service_started
+    entrypoint: "java -jar /app/app.jar"
+    networks:
+        - WAPDI-net
 
   react:
     build:
@@ -58,9 +58,7 @@ services:
     env_file:
         - ../react/.env
     volumes:
-      - type: bind
-        source: ../react/react-app
-        target: /app/react/react-app
+      - ../react/app:/usr/src/app
     command: sh -c "
       if [ ! -d react-app ]; then
       npx create-react-app react-app --template typescript;
@@ -76,5 +74,3 @@ services:
 networks:
     WAPDI-net:
       driver: bridge
-
-
