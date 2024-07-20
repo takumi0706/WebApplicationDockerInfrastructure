@@ -2,14 +2,14 @@ version: "3"
 services:
   mysql:
     build: ../mysql
-    container_name: WADI-mysql
+    container_name: WADIdb
     env_file:
-      - ../mysql/db.env
+      - mysql.env
     volumes:
         - ../mysql/data:/var/lib/mysql #実データの永続化
         - ../mysql/log:/var/log/mysql #ログの永続化
     ports:
-        - "13306:3306"
+        - "3306:3306"
     networks:
         - WADI-net
 
@@ -17,11 +17,11 @@ services:
     image: phpmyadmin/phpmyadmin
     container_name: WADI-dbclient
     env_file:
-        - ../dbclient/dbconfig.env
+      - phpmyadmin.env
     links:
       - mysql
     ports:
-        - "14200:80"
+        - "4200:80"
     volumes:
         - ../dbclient/sessions:/sessions
     depends_on:
@@ -36,7 +36,7 @@ services:
         dockerfile: Dockerfile
     container_name: WADI-springboot
     env_file:
-        - ../mysql/db.env
+        - mysql.env
     tty: true
     working_dir: /app/springboot
     ports:
@@ -55,7 +55,7 @@ services:
         dockerfile: Dockerfile
     container_name: WADI-react
     env_file:
-        - ../react/.env
+        - react.env
     volumes:
       - ../react/app:/usr/src/app
     command: sh -c "
